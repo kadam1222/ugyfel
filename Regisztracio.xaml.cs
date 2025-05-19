@@ -1,4 +1,5 @@
-﻿using System;
+﻿using MySql.Data.MySqlClient;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -34,6 +35,34 @@ namespace ugyfel
             if(string.IsNullOrEmpty(nev) || string.IsNullOrEmpty(pass))
             {
                 MessageBox.Show("Töltsön ki minden mezőt!", "Hiányzó adat!" ,MessageBoxButton.OK,MessageBoxImage.Error);
+                return;
+            }
+            if (pass != passujra)
+            {
+                MessageBox.Show("A két jelszó nem egyezik!", "Hibás adat!", MessageBoxButton.OK, MessageBoxImage.Error);
+                return;
+            }
+            if (!emailcim.Contains('@') || !emailcim.Contains('.'))
+            {
+                MessageBox.Show("Az e-mail cím nem megfelelő", "Hibás adat!", MessageBoxButton.OK, MessageBoxImage.Error);
+                return;
+            }
+            try
+            {
+                using (MySqlConnection conn = new MySql.Data.MySqlClient.MySqlConnection(App.ConnString))
+                {
+                    conn.Open();
+                    string query = "Select count(*) from felhasznalo where felhasznalo=@fnev or email=@email";
+                    var check = new MySql.Data.MySqlClient.MySqlCommand(query, conn);
+                    check.Parameters.AddWithValue("@fnev",nev);
+                    check.Parameters.AddWithValue("@email", emailcim);
+                    int db = (int)check.ExecuteScalar();
+                }
+                    
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"Hiba történt az adatbáziskapcsolat során:\n"+ex.Message, "Hibás adat!", MessageBoxButton.OK, MessageBoxImage.Error);
             }
         }
     }
