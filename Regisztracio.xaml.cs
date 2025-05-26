@@ -57,6 +57,10 @@ namespace ugyfel
                     check.Parameters.AddWithValue("@fnev",nev);
                     check.Parameters.AddWithValue("@email", emailcim);
                     int db = (int)check.ExecuteScalar();
+                    if (db > 0) {
+                        MessageBox.Show("Már van ilyen felhasználó vagy email cím", "Hibás adat!", MessageBoxButton.OK, MessageBoxImage.Error);
+                        return;
+                    }
                 }
                     
             }
